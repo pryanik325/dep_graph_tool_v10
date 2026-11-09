@@ -95,3 +95,15 @@ def build_dependency_graph(
                 stack.append((dep_name, depth + 1))
 
     return graph
+
+def invert_graph(graph: dict) -> dict:
+    """Invert the dependency graph to find reverse dependencies."""
+    inverted = {}
+    for pkg, deps in graph.items():
+        if pkg not in inverted:
+            inverted[pkg] = []
+        for dep in deps:
+            if dep not in inverted:
+                inverted[dep] = []
+            inverted[dep].append(pkg)
+    return inverted
