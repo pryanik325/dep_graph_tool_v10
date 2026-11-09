@@ -56,7 +56,7 @@ def fetch_package_info(
 
     base_url = repo_url if repo_url.endswith('/') else repo_url + '/'
     url = f"{base_url}{package_name}/{version}"
-
+    print(url)
     return _fetch_from_url(url)
 
 

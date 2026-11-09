@@ -1,28 +1,20 @@
-
-
 import sys
 from config_parser import load_config, print_config, ConfigError
-from npm_client import (
-    fetch_package_info,
-    extract_dependencies,
-    NpmClientError
-)
+from npm_client import NpmClientError
+from graph_builder import build_dependency_graph
 
 
-def _print_dependencies(deps: dict) -> None:
-
-    if not deps:
-        print("No direct dependencies found.")
-        return
-
-    print("--- Direct Dependencies ---")
-    for name, version in deps.items():
-        print(f"{name}: {version}")
-    print("---------------------------")
+def _print_graph(graph: dict) -> None:
+    print("\n--- Dependency Graph ---")
+    for pkg, deps in graph.items():
+        if deps:
+            print(f"{pkg} -> {', '.join(deps)}")
+        else:
+            print(f"{pkg} -> (no dependencies)")
+    print("------------------------")
 
 
 def main() -> None:
-
     config_path = 'config.ini'
 
     if len(sys.argv) > 1:
@@ -32,18 +24,14 @@ def main() -> None:
         config = load_config(config_path)
         print_config(config)
 
-        print("\nFetching package info...")
-        pkg_info = fetch_package_info(
-            config['repo_url'],
+        print("\nBuilding dependency graph...")
+        graph = build_dependency_graph(
             config['package_name'],
-            config['package_version'],
-            config['test_mode']
+            config
         )
 
-        deps = extract_dependencies(pkg_info)
-        _print_dependencies(deps)
+        _print_graph(graph)
 
-        print("\nStage 2 completed successfully.")
     except ConfigError as e:
         print(f"Config Error: {e}", file=sys.stderr)
         sys.exit(1)
