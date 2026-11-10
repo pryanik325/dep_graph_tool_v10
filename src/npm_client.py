@@ -4,6 +4,10 @@ import urllib.request
 import urllib.error
 import os
 
+from config_parser import load_config
+
+config = load_config('config.ini')
+pkg_name=config['package_name']
 REQUEST_TIMEOUT = 10
 
 
@@ -55,7 +59,10 @@ def fetch_package_info(
         return _read_from_file(repo_url)
 
     base_url = repo_url if repo_url.endswith('/') else repo_url + '/'
-    url = f"{base_url}{package_name}/{version}"
+    if package_name==pkg_name:
+        url = f"{base_url}{package_name}/{version}"
+    else:
+        url = f"{base_url}{package_name}/latest"
     print(url)
     return _fetch_from_url(url)
 
